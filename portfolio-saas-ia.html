@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="fr" data-lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Case study - Pierre BASTIER - SaaS construit uniquement en pilotant des outils IA</title>
+<style>
+  :root{
+    --bg:#f7f6f3;
+    --surface:#ffffff;
+    --ink:#1a1c1f;
+    --ink-soft:#52575e;
+    --ink-faint:#878d96;
+    --line:#e6e3dd;
+    --accent:#2f5d50;        /* vert sobre */
+    --accent-soft:#eaf1ee;
+    --accent-ink:#234b40;
+    --amber:#9a6b1f;
+    --amber-soft:#f6efe2;
+    --radius:14px;
+    --maxw:1080px;
+    --mono:"SFMono-Regular",ui-monospace,"JetBrains Mono",Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    font-family:var(--sans);
+    background:var(--bg);
+    color:var(--ink);
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  /* langue */
+  [data-lang="fr"] .en{display:none;}
+  [data-lang="en"] .fr{display:none;}
+
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px;}
+
+  /* top bar */
+  .topbar{
+    position:sticky;top:0;z-index:50;
+    background:rgba(247,246,243,.86);
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);
+  }
+  .topbar .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:60px;padding-top:8px;padding-bottom:8px;}
+  .brand{font-weight:600;font-size:14px;letter-spacing:.2px;display:flex;align-items:center;gap:9px;line-height:1.3;}
+  .brand .muted{font-size:13px;}
+  @media(max-width:720px){.brand .muted{display:none;}}
+  .brand .dot{width:9px;height:9px;border-radius:50%;background:var(--accent);display:inline-block;}
+  .brand .muted{color:var(--ink-faint);font-weight:400;}
+  .lang-switch{display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--surface);}
+  .lang-switch button{
+    border:0;background:transparent;cursor:pointer;
+    padding:6px 14px;font-size:13px;font-weight:600;color:var(--ink-faint);
+    font-family:var(--sans);transition:.15s;
+  }
+  .lang-switch button.active{background:var(--accent);color:#fff;}
+
+  /* hero */
+  .hero{padding:72px 0 48px;border-bottom:1px solid var(--line);}
+  .eyebrow{
+    font-family:var(--mono);font-size:12.5px;letter-spacing:.5px;
+    color:var(--accent-ink);text-transform:uppercase;margin-bottom:18px;
+    display:inline-block;background:var(--accent-soft);padding:5px 11px;border-radius:6px;
+  }
+  h1{font-size:clamp(30px,4.6vw,50px);line-height:1.1;margin:0 0 20px;letter-spacing:-.02em;font-weight:700;}
+  .lede{font-size:clamp(17px,2vw,20px);color:var(--ink-soft);max-width:680px;margin:0 0 30px;}
+  .lede strong{color:var(--ink);font-weight:600;}
+
+  .stat-row{display:flex;flex-wrap:wrap;gap:14px;margin-top:8px;}
+  .stat{
+    background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px 20px;flex:1 1 150px;min-width:140px;
+  }
+  .stat .n{font-size:26px;font-weight:700;letter-spacing:-.01em;color:var(--ink);}
+  .stat .l{font-size:13px;color:var(--ink-faint);margin-top:2px;}
+
+  /* sections */
+  section{padding:60px 0;border-bottom:1px solid var(--line);}
+  .sec-label{font-family:var(--mono);font-size:12.5px;letter-spacing:.6px;color:var(--ink-faint);text-transform:uppercase;margin-bottom:10px;}
+  h2{font-size:clamp(23px,3vw,32px);margin:0 0 14px;letter-spacing:-.015em;font-weight:700;}
+  .sec-intro{color:var(--ink-soft);max-width:720px;font-size:16.5px;margin-bottom:36px;}
+
+  /* method / two-brain */
+  .method-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+  .method-card{
+    background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:26px;
+  }
+  .method-card h3{margin:0 0 6px;font-size:18px;display:flex;align-items:center;gap:9px;}
+  .method-card .role{font-family:var(--mono);font-size:11.5px;color:var(--accent-ink);text-transform:uppercase;letter-spacing:.4px;margin-bottom:14px;}
+  .method-card ul{margin:0;padding-left:18px;color:var(--ink-soft);font-size:15px;}
+  .method-card li{margin-bottom:7px;}
+  .pill-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:34px;}
+  .pill{
+    font-family:var(--mono);font-size:12.5px;background:var(--surface);
+    border:1px solid var(--line);border-radius:999px;padding:7px 14px;color:var(--ink-soft);
+  }
+  .pill b{color:var(--accent-ink);font-weight:600;}
+
+  /* bricks */
+  .bricks{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+  .brick{
+    background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+    padding:22px;display:flex;flex-direction:column;transition:.16s;
+  }
+  .brick:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 8px 24px -16px rgba(47,93,80,.4);}
+  .brick .ico{font-family:var(--mono);font-size:12px;color:var(--accent-ink);background:var(--accent-soft);
+    width:fit-content;padding:4px 9px;border-radius:6px;margin-bottom:13px;letter-spacing:.3px;}
+  .brick h3{margin:0 0 8px;font-size:16.5px;font-weight:650;}
+  .brick p{margin:0;font-size:14px;color:var(--ink-soft);}
+  .brick .tags{margin-top:14px;display:flex;flex-wrap:wrap;gap:6px;}
+  .brick .tags span{font-family:var(--mono);font-size:11px;color:var(--ink-faint);border:1px solid var(--line);border-radius:5px;padding:3px 7px;}
+
+  /* stack */
+  .stack-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;}
+  .stack-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:22px;}
+  .stack-card h3{margin:0 0 12px;font-size:15px;font-family:var(--mono);color:var(--accent-ink);letter-spacing:.3px;}
+  .stack-card .items{display:flex;flex-wrap:wrap;gap:8px;}
+  .stack-card .items span{font-size:13.5px;background:var(--bg);border:1px solid var(--line);border-radius:7px;padding:6px 11px;color:var(--ink);}
+
+  /* skills callout */
+  .skills{background:var(--accent);color:#fff;border-radius:var(--radius);padding:40px;}
+  .skills h2{color:#fff;}
+  .skills .sec-label{color:rgba(255,255,255,.65);}
+  .skills-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:22px;margin-top:26px;}
+  .skill-item h3{margin:0 0 5px;font-size:16px;color:#fff;}
+  .skill-item p{margin:0;font-size:14.5px;color:rgba(255,255,255,.82);}
+
+  /* note */
+  .note{background:var(--amber-soft);border:1px solid #e8dcc2;border-radius:var(--radius);padding:18px 22px;font-size:14.5px;color:#6b531f;}
+  .note b{color:var(--amber);}
+
+  /* interface previews */
+  .shots{display:grid;grid-template-columns:1fr;gap:30px;max-width:740px;margin-left:auto;margin-right:auto;}
+  .shot-cap{font-size:14px;color:var(--ink-soft);margin:14px 2px 0;}
+  .shot-cap b{color:var(--ink);font-weight:600;}
+  .frame{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff;box-shadow:0 18px 40px -28px rgba(26,28,31,.5);}
+  .frame .bar{display:flex;align-items:center;gap:7px;padding:11px 14px;background:#f1efe9;border-bottom:1px solid var(--line);}
+  .frame .bar i{width:11px;height:11px;border-radius:50%;display:inline-block;background:#cfcabf;}
+  .frame .bar .addr{margin-left:12px;font-family:var(--mono);font-size:11.5px;color:var(--ink-faint);background:#fff;border:1px solid var(--line);border-radius:6px;padding:3px 12px;flex:1;max-width:360px;}
+  /* mini app */
+  .app{display:flex;font-size:12px;min-height:360px;}
+  .app .side{width:184px;flex-shrink:0;border-right:1px solid var(--line);padding:16px 12px;background:#fcfbf9;}
+  .app .logo{font-weight:700;font-size:14px;margin:2px 6px 18px;display:flex;align-items:center;gap:7px;}
+  .app .logo .badge{font-size:8.5px;background:var(--ink);color:#fff;border-radius:4px;padding:2px 6px;letter-spacing:.5px;}
+  .app .grp{font-size:9.5px;letter-spacing:.6px;color:var(--ink-faint);text-transform:uppercase;margin:14px 8px 7px;}
+  .app .nav{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:7px;color:var(--ink-soft);margin-bottom:2px;}
+  .app .nav.active{background:var(--ink);color:#fff;font-weight:600;}
+  .app .nav .gi{width:14px;height:14px;border-radius:4px;border:1.6px solid currentColor;opacity:.7;flex-shrink:0;}
+  .app .main{flex:1;padding:20px 22px;background:#fff;overflow:hidden;}
+  .app .h{font-size:19px;font-weight:700;margin:0 0 3px;letter-spacing:-.01em;}
+  .app .sub{color:var(--ink-faint);font-size:11.5px;margin-bottom:18px;}
+  /* table */
+  .tbl{width:100%;border-collapse:collapse;}
+  .tbl th{text-align:left;font-size:10px;color:var(--ink-faint);font-weight:500;padding:0 10px 9px;border-bottom:1px solid var(--line);text-transform:uppercase;letter-spacing:.3px;}
+  .tbl td{padding:11px 10px;border-bottom:1px solid #f1efe9;color:var(--ink);font-size:12px;}
+  .tbl td.r,.tbl th.r{text-align:right;}
+  .bdg{font-size:10px;padding:3px 9px;border-radius:999px;font-weight:600;}
+  .bdg.ok{background:#e7f3ec;color:#2f6b4f;}
+  .bdg.no{background:#fbe9e9;color:#a23b3b;}
+  /* kpi */
+  .chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:16px;}
+  .chips span{font-size:10.5px;border:1px solid var(--line);border-radius:999px;padding:5px 12px;color:var(--ink-soft);}
+  .chips span.on{background:var(--ink);color:#fff;border-color:var(--ink);}
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;}
+  .kpi{border:1px solid var(--line);border-radius:10px;padding:13px 15px;}
+  .kpi .k{font-size:9px;letter-spacing:.4px;color:var(--ink-faint);text-transform:uppercase;}
+  .kpi .v{font-size:23px;font-weight:700;margin-top:5px;letter-spacing:-.01em;}
+  .kpi .d{font-size:9.5px;color:var(--ink-faint);margin-top:4px;}
+  .exp{display:flex;gap:8px;}
+  .exp span{font-size:10.5px;border:1px solid var(--line);border-radius:7px;padding:5px 11px;color:var(--ink-soft);}
+  .tag-real{display:inline-block;font-family:var(--mono);font-size:11px;background:var(--accent-soft);color:var(--accent-ink);border-radius:6px;padding:4px 10px;margin-bottom:4px;}
+  /* public buyer page */
+  .pub{font-size:12px;background:#fff;min-height:360px;}
+  .pubtop{display:flex;align-items:center;justify-content:space-between;padding:13px 20px;border-bottom:1px solid var(--line);}
+  .pblogo{font-weight:700;font-size:14px;}
+  .pbnav{display:flex;gap:16px;align-items:center;color:var(--ink-soft);font-size:11.5px;}
+  .pbnav .btn{border:1px solid var(--line);border-radius:7px;padding:5px 11px;}
+  .pubgrid{display:grid;grid-template-columns:1.7fr 1fr;gap:22px;padding:22px 24px;}
+  .evtitle{font-size:24px;font-weight:800;margin:0 0 14px;letter-spacing:-.02em;}
+  .evmeta{display:flex;align-items:flex-start;gap:8px;color:var(--ink-soft);font-size:12px;margin-bottom:7px;}
+  .evmeta .pin{color:var(--accent);}
+  .evlink{color:var(--accent-ink);font-size:11.5px;margin:2px 0 14px;}
+  .evdesc{color:var(--ink);font-size:12.5px;margin:6px 0 18px;}
+  .trow{display:flex;align-items:center;justify-content:space-between;border:1px solid var(--line);border-radius:10px;padding:15px 16px;margin-bottom:11px;}
+  .trow .tname{font-weight:650;font-size:13px;}
+  .trow .tname small{font-weight:400;color:var(--ink-faint);margin-left:7px;}
+  .trow .tprice{font-size:15px;font-weight:700;margin-top:5px;}
+  .step{display:flex;align-items:center;gap:0;border:0;}
+  .step b{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border:1px solid var(--line);font-size:15px;color:var(--ink-soft);}
+  .step b:first-child{border-radius:8px 0 0 8px;}
+  .step b:last-child{border-radius:0 8px 8px 0;}
+  .step .q{width:40px;height:34px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);display:inline-flex;align-items:center;justify-content:center;font-weight:600;}
+  .promo{display:flex;align-items:center;justify-content:space-between;border:1px solid var(--line);border-radius:10px;padding:13px 16px;color:var(--ink-soft);font-size:12px;}
+  .cart{border:1px solid var(--line);border-radius:12px;padding:18px;height:fit-content;}
+  .cart .ct{display:flex;align-items:center;gap:8px;font-weight:650;font-size:13px;margin-bottom:14px;}
+  .cart .ct .ti{color:var(--accent);}
+  .cline{display:flex;justify-content:space-between;color:var(--ink-soft);font-size:12px;padding:9px 0;border-top:1px solid #f1efe9;}
+  .cline.tot{color:var(--ink);font-size:13px;}
+  .cline.tot b{font-size:19px;}
+  .cnote{font-size:10.5px;color:var(--ink-faint);margin:2px 0 14px;}
+  .paybtn{background:var(--accent);color:#fff;text-align:center;font-weight:650;border-radius:9px;padding:13px;font-size:13px;}
+  /* stripe checkout modal */
+  .paywrap{background:#ece9e3;padding:26px;display:flex;justify-content:center;min-height:360px;}
+  .paycard{background:#fff;border-radius:12px;width:100%;max-width:430px;box-shadow:0 16px 40px -20px rgba(0,0,0,.35);overflow:hidden;}
+  .payhead{display:flex;align-items:center;justify-content:space-between;padding:15px 18px;border-bottom:1px solid var(--line);font-weight:650;font-size:14px;}
+  .payhead .x{width:24px;height:24px;border:1px solid var(--line);border-radius:6px;display:inline-flex;align-items:center;justify-content:center;color:var(--accent);}
+  .paybody{padding:18px;}
+  .testmode{text-align:center;}
+  .testmode span{background:#fbe6c8;color:#8a5a12;font-size:9.5px;font-weight:700;letter-spacing:.5px;padding:3px 10px;border-radius:5px;}
+  .payitem{text-align:center;color:var(--ink-soft);font-size:12px;margin-top:14px;}
+  .payamt{text-align:center;font-size:26px;font-weight:800;margin:4px 0 18px;letter-spacing:-.01em;}
+  .wallets{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .wallet{height:42px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;}
+  .wallet.link{background:#00d66f;color:#04341f;}
+  .wallet.amz{background:#ffd814;color:#111;}
+  .or{display:flex;align-items:center;gap:10px;color:var(--ink-faint);font-size:10.5px;margin:14px 0;}
+  .or:before,.or:after{content:"";flex:1;height:1px;background:var(--line);}
+  .pfield{border:1px solid var(--line);border-radius:8px;padding:12px 14px;display:flex;gap:18px;align-items:center;background:#fbfbfa;font-size:12px;}
+  .pfield .lab{color:var(--ink-faint);}
+  .pmlabel{font-weight:650;font-size:12.5px;margin:16px 0 9px;}
+  .pm{display:flex;align-items:center;gap:11px;border:1px solid var(--line);border-radius:8px;padding:12px 14px;margin-bottom:9px;font-size:12.5px;}
+  .pm .radio{width:15px;height:15px;border:1.5px solid var(--ink-faint);border-radius:50%;flex-shrink:0;}
+  .pm .cards{margin-left:auto;display:flex;gap:4px;}
+  .pm .cards b{font-size:8px;background:#1a2b6b;color:#fff;border-radius:3px;padding:3px 4px;letter-spacing:.3px;}
+  .pm .cards b.mc{background:#eb5b25;}.pm .cards b.cb{background:#0a7d4b;}.pm .cards b.ax{background:#1574bb;}
+  .pm .kl{margin-left:auto;background:#ffb3c7;color:#0a0a0a;font-size:9px;font-weight:700;border-radius:4px;padding:3px 7px;}
+  /* account area (buyer) + shared bits */
+  .app .side{display:flex;flex-direction:column;}
+  .app .navwrap{flex:1;}
+  .app .uf{border-top:1px solid var(--line);padding-top:12px;margin-top:10px;}
+  .app .uf .nm{font-weight:600;font-size:11px;}
+  .app .uf .em{font-size:10px;color:var(--ink-faint);margin-bottom:9px;word-break:break-all;}
+  .app .uf .lo{display:flex;gap:7px;align-items:center;color:var(--ink-soft);font-size:10.5px;}
+  .logo.plain{margin-bottom:14px;}
+  .tabs{display:flex;gap:9px;margin-bottom:18px;flex-wrap:wrap;}
+  .tabb{display:flex;align-items:center;gap:7px;border:1px solid var(--line);border-radius:999px;padding:7px 13px;font-size:11px;color:var(--ink-soft);}
+  .tabb.on{border-color:var(--accent);color:var(--accent-ink);background:var(--accent-soft);}
+  .tabb .ct{background:#fff;border:1px solid var(--line);border-radius:999px;font-size:9px;padding:1px 7px;}
+  .ecards{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;}
+  .ecard{border:1px solid var(--line);border-radius:10px;padding:14px;}
+  .ecard .et{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
+  .ecard .en{font-weight:700;font-size:12px;}
+  .ecard .m{font-size:10px;color:var(--ink-soft);margin-top:8px;}
+  .ecard .foot{display:flex;justify-content:space-between;border-top:1px solid #f1efe9;margin-top:12px;padding-top:10px;font-size:10.5px;}
+  .ecard .foot .vl{color:var(--accent-ink);}
+  .mh{font-weight:700;font-size:15px;margin:24px 0 3px;display:flex;align-items:center;gap:8px;}
+  .mhs{font-size:10.5px;color:var(--ink-faint);margin-bottom:13px;}
+  .empty{border:1px dashed var(--line);border-radius:12px;padding:26px;text-align:center;}
+  .empty .t{font-weight:650;font-size:13px;}
+  .empty .s{font-size:11px;color:var(--ink-faint);margin:6px 0 13px;}
+  .empty .b{display:inline-block;border:1px solid var(--line);border-radius:8px;padding:8px 15px;font-size:11px;}
+  .filters{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px;}
+  .filters .se{flex:1;min-width:150px;border:1px solid var(--line);border-radius:8px;padding:8px 12px;color:var(--ink-faint);font-size:10.5px;}
+  .filters .fd{border:1px solid var(--line);border-radius:8px;padding:8px 11px;font-size:10.5px;color:var(--ink-soft);}
+  .inv{background:var(--ink);color:#fff;border-radius:9px;padding:9px 15px;font-size:11.5px;font-weight:600;display:inline-flex;gap:7px;align-items:center;}
+  .bdg.blue{background:#e8eefb;color:#2f4fb0;}
+  .bdg.purple{background:#efe8fb;color:#6b3fb0;}
+  .bdg.amber{background:#fbf0e0;color:#9a6b1f;}
+  .bdg.gray{background:#eef0f2;color:#5b626b;}
+  .youtag{font-size:9px;border:1px solid var(--line);border-radius:5px;padding:2px 6px;color:var(--ink-faint);margin-left:7px;}
+  .logo .badge.crm{background:#1f9d57;}
+  .app .org{display:flex;align-items:center;gap:8px;font-weight:600;font-size:11px;padding:9px 6px;border-bottom:1px solid var(--line);margin-bottom:10px;}
+  .erow{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:10px;padding:11px;font-size:11px;}
+  .ethumb{width:44px;height:44px;border-radius:8px;background:#eef1f0;display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--ink-faint);flex-shrink:0;}
+  .erow .enm{font-weight:700;}
+  .erow .edt{color:var(--ink-faint);font-size:10px;margin-top:2px;}
+  .eprog{flex:1;min-width:60px;}
+  .eprog .lbl{display:flex;justify-content:space-between;font-size:9.5px;color:var(--ink-faint);}
+  .eprog .track{height:6px;background:#eef1f0;border-radius:999px;overflow:hidden;margin-top:4px;}
+  .eprog .fill{height:100%;background:var(--accent);}
+  @media(max-width:620px){.app .side{display:none;}.kpis{grid-template-columns:repeat(2,1fr);}.pubgrid{grid-template-columns:1fr;}.ecards{grid-template-columns:1fr;}}
+
+  footer{padding:40px 0 60px;color:var(--ink-faint);font-size:13.5px;}
+  footer a{color:var(--accent-ink);text-decoration:none;}
+
+  @media(max-width:880px){
+    .bricks{grid-template-columns:repeat(2,1fr);}
+    .method-grid,.stack-grid,.skills-grid{grid-template-columns:1fr;}
+  }
+  @media(max-width:560px){
+    .bricks{grid-template-columns:1fr;}
+    .hero{padding:48px 0 36px;}
+    section{padding:44px 0;}
+    .skills{padding:28px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <div class="brand">
+      <span class="dot"></span>
+      <span class="fr">Case study&nbsp;<span class="muted">- Pierre BASTIER - SaaS construit uniquement en pilotant des outils IA</span></span>
+      <span class="en">Case study&nbsp;<span class="muted">- Pierre BASTIER - a SaaS built purely by steering AI tools</span></span>
+    </div>
+    <div class="lang-switch" role="group" aria-label="language">
+      <button id="btn-fr" class="active" onclick="setLang('fr')">FR</button>
+      <button id="btn-en" onclick="setLang('en')">EN</button>
+    </div>
+  </div>
+</div>
+
+<header class="hero">
+  <div class="wrap">
+    <span class="eyebrow">
+      <span class="fr">Étude de cas produit · Non-développeur</span>
+      <span class="en">Product case study · Non-developer</span>
+    </span>
+    <h1>
+      <span class="fr">Une plateforme de billetterie en ligne, conçue et mise en service sans écrire le code moi-même, en dirigeant des outils d'IA.</span>
+      <span class="en">An online ticketing platform, designed and put into service without me writing the code myself, by directing AI tools.</span>
+    </h1>
+    <p class="lede">
+      <span class="fr">Au départ, un projet personnel&nbsp;: je l'ai lancé <strong>pour le plaisir d'apprendre</strong> et pour <strong>aider des amis qui organisent des événements</strong> et ne trouvaient pas d'outil vraiment adapté à leurs besoins. L'objectif n'a jamais été d'en faire un produit à vendre, mais de voir jusqu'où on peut aller en construisant un vrai logiciel grâce à l'IA.</span>
+      <span class="en">It started as a personal project: I built it <strong>for the fun of learning</strong> and to <strong>help friends who organize events</strong> and couldn't find a tool that really fit their needs. The goal was never to sell a product, but to see how far you can go building real software with AI.</span>
+    </p>
+    <p class="lede">
+      <span class="fr">Je ne suis pas développeur. Pourtant, en dirigeant des outils d'IA, j'ai conçu, fait coder, testé et mis en ligne une application complète&nbsp;: <strong>paiement en ligne, création et envoi de billets, gestion des clients, acquisition de nouveaux clients, fidélisation, rachat de billets et tâches automatiques</strong>. Cette page explique, simplement, ce qui a été construit et comment.</span>
+      <span class="en">I'm not a developer. Yet by directing AI tools, I designed, had it coded, tested and put online a complete application: <strong>online payment, ticket creation and delivery, customer management, customer acquisition, loyalty, ticket buyback and automated tasks</strong>. This page explains, in plain terms, what was built and how.</span>
+    </p>
+    <div class="stat-row">
+      <div class="stat"><div class="n">11+</div><div class="l"><span class="fr">fonctionnalités majeures livrées</span><span class="en">major features shipped</span></div></div>
+      <div class="stat"><div class="n">200+</div><div class="l"><span class="fr">lots de modifications validés</span><span class="en">batches of changes shipped</span></div></div>
+      <div class="stat"><div class="n">70+</div><div class="l"><span class="fr">évolutions de la base de données</span><span class="en">database updates</span></div></div>
+      <div class="stat"><div class="n">64</div><div class="l"><span class="fr">règles de conception figées</span><span class="en">design rules locked in</span></div></div>
+    </div>
+  </div>
+</header>
+
+<!-- METHOD -->
+<section id="method">
+  <div class="wrap">
+    <div class="sec-label">01 · <span class="fr">La méthode</span><span class="en">The method</span></div>
+    <h2><span class="fr">Un rôle de chef d'orchestre</span><span class="en">A conductor's role</span></h2>
+    <p class="sec-intro">
+      <span class="fr">Je n'écris pas le code moi-même. Mon travail consiste à <strong>expliquer clairement à l'IA ce qu'il faut construire</strong>, à <strong>vérifier qu'elle l'a bien fait</strong>, et à <strong>corriger le tir</strong> quand c'est nécessaire, un peu comme un chef de projet qui dirige une équipe, sauf que l'équipe, ici, ce sont des outils d'IA. J'ai organisé le travail autour de deux rôles complémentaires.</span>
+      <span class="en">I don't write the code myself. My job is to <strong>clearly explain to the AI what to build</strong>, <strong>check that it did it right</strong>, and <strong>course-correct</strong> when needed, much like a project manager leading a team, except here the team is made of AI tools. I organized the work around two complementary roles.</span>
+    </p>
+
+    <div class="method-grid">
+      <div class="method-card">
+        <h3>🧭 <span class="fr">Le rôle « décision &amp; contrôle »</span><span class="en">The "decide &amp; check" role</span></h3>
+        <div class="role"><span class="fr">Imaginer · expliquer · tester · valider</span><span class="en">Imagine · explain · test · approve</span></div>
+        <ul>
+          <li><span class="fr">Décrire chaque fonctionnalité voulue et donner des consignes précises à l'IA.</span><span class="en">Describe each desired feature and give the AI precise instructions.</span></li>
+          <li><span class="fr">Vérifier que les données sont bien rangées et cohérentes dans la base.</span><span class="en">Check that the data is correctly organized and consistent in the database.</span></li>
+          <li><span class="fr">Tester l'application comme un vrai utilisateur, directement dans le navigateur.</span><span class="en">Test the app like a real user, straight in the browser.</span></li>
+          <li><span class="fr">Contrôler la qualité : respect des règles, du droit (RGPD) et absence de régressions.</span><span class="en">Control quality: rules followed, law respected (GDPR), and no new bugs introduced.</span></li>
+        </ul>
+      </div>
+      <div class="method-card">
+        <h3>⚙️ <span class="fr">Le rôle « fabrication »</span><span class="en">The "build" role</span></h3>
+        <div class="role"><span class="fr">Coder · assembler · mettre en ligne</span><span class="en">Code · assemble · publish</span></div>
+        <ul>
+          <li><span class="fr"><b>Claude Code</b> écrit et modifie le code à partir de mes consignes.</span><span class="en"><b>Claude Code</b> writes and edits the code from my instructions.</span></li>
+          <li><span class="fr">Les modifications sont regroupées en lots, relues puis intégrées proprement.</span><span class="en">Changes are grouped into batches, reviewed, then merged cleanly.</span></li>
+          <li><span class="fr">Mise en ligne automatique à chaque validation, sans intervention manuelle.</span><span class="en">Automatic publishing on every approval, with no manual step.</span></li>
+          <li><span class="fr">Les évolutions de la base de données sont appliquées puis vérifiées.</span><span class="en">Database changes are applied and then verified.</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="pill-row">
+      <div class="pill"><b>Claude Code</b> · <span class="fr">assistant qui écrit le code</span><span class="en">assistant that writes the code</span></div>
+      <div class="pill"><b>Cowork</b> · <span class="fr">poste de pilotage &amp; de tests</span><span class="en">control &amp; testing desk</span></div>
+      <div class="pill"><b><span class="fr">Connecteurs</span><span class="en">Connectors</span></b> · <span class="fr">accès direct base de données &amp; navigateur</span><span class="en">direct database &amp; browser access</span></div>
+      <div class="pill"><b><span class="fr">Agents autonomes</span><span class="en">Autonomous agents</span></b> · <span class="fr">tâches qui tournent seules</span><span class="en">tasks that run on their own</span></div>
+      <div class="pill"><b><span class="fr">Mémoire de projet</span><span class="en">Project memory</span></b> · <span class="fr">documentation que l'IA relit</span><span class="en">docs the AI re-reads</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- BRICKS -->
+<section id="bricks">
+  <div class="wrap">
+    <div class="sec-label">02 · <span class="fr">Les fonctionnalités</span><span class="en">The features</span></div>
+    <h2><span class="fr">Ce qui a réellement été construit</span><span class="en">What was actually built</span></h2>
+    <p class="sec-intro">
+      <span class="fr">Chacune de ces fonctionnalités marche pour de vrai&nbsp;: paiements réels, données enregistrées, et actions qui se déclenchent toutes seules. Voici les principales, expliquées simplement.</span>
+      <span class="en">Each of these features genuinely works: real payments, stored data, and actions that fire on their own. Here are the main ones, explained simply.</span>
+    </p>
+
+    <div class="bricks">
+
+      <div class="brick">
+        <span class="ico">PAY</span>
+        <h3><span class="fr">Paiement en ligne</span><span class="en">Online payment</span></h3>
+        <p><span class="fr">L'acheteur paie sa place par carte en toute sécurité. L'argent est ensuite reversé à l'organisateur, et les remboursements sont gérés. Les frais de la plateforme restent invisibles pour l'acheteur.</span><span class="en">Buyers pay for their ticket securely by card. The money is then paid out to the organizer, and refunds are handled. The platform's fees stay invisible to the buyer.</span></p>
+        <div class="tags"><span class="fr">paiement carte</span><span class="en">card payment</span><span class="fr">reversements</span><span class="en">payouts</span><span class="fr">remboursements</span><span class="en">refunds</span></div>
+      </div>
+
+      <div class="brick">
+        <span class="ico">BILLETS</span>
+        <h3><span class="fr">Création &amp; envoi des billets</span><span class="en">Ticket creation &amp; delivery</span></h3>
+        <p><span class="fr">Création de plusieurs types de places avec un nombre limité, génération du billet en PDF, et lecture du billet à l'entrée pour contrôler l'accès. Une couche « blockchain » existe en option.</span><span class="en">Several ticket types with limited quantities, the ticket generated as a PDF, and ticket scanning at the door to control entry. A "blockchain" layer is available as an option.</span></p>
+        <div class="tags"><span class="fr">billet PDF</span><span class="en">PDF ticket</span><span class="fr">scan à l'entrée</span><span class="en">door scanning</span><span class="fr">quotas</span><span class="en">quotas</span></div>
+      </div>
+
+      <div class="brick">
+        <span class="ico">CRM</span>
+        <h3><span class="fr">Gestion des clients (CRM)</span><span class="en">Customer management (CRM)</span></h3>
+        <p><span class="fr">Un tableau de bord pour suivre les ventes, répondre aux clients et voir des statistiques. Chaque participant a sa fiche, qui le suit d'un événement à l'autre.</span><span class="en">A dashboard to track sales, answer customers and see statistics. Each attendee has a profile that follows them from one event to the next.</span></p>
+        <div class="tags"><span class="fr">tableau de bord</span><span class="en">dashboard</span><span class="fr">fiches client</span><span class="en">customer profiles</span></div>
+      </div>
+
+      <div class="brick">
+        <span class="ico">EMAIL</span>
+        <h3><span class="fr">Campagnes par email</span><span class="en">Email campaigns</span></h3>
+        <p><span class="fr">Un outil pour écrire des emails, choisir précisément qui les reçoit (par exemple « les clients fidèles »), les envoyer, et voir qui les a ouverts et cliqués.</span><span class="en">A tool to write emails, precisely choose who receives them (e.g. "loyal customers"), send them, and see who opened and clicked.</span></p>
+        <div class="tags"><span class="fr">ciblage</span><span class="en">targeting</span><span class="fr">suivi ouvertures</span><span class="en">open tracking</span></div>
+      </div>
+
+      <div class="brick">
+        <span class="ico">ACQ</span>
+        <h3><span class="fr">Trouver de nouveaux clients</span><span class="en">Finding new customers</span></h3>
+        <p><span class="fr">Codes promo, mesure de l'efficacité de chaque canal de pub (« d'où viennent mes ventes ? »), et programme de parrainage où l'on récompense ceux qui font venir du monde.</span><span class="en">Promo codes, a way to measure which advertising channel works ("where do my sales come from?"), and a referral program that rewards those who bring people in.</span></p>
+        <div class="tags"><span class="fr">codes promo</span><span class="en">promo codes</span><span class="fr">origine des ventes</span><span class="en">sales source</span><span class="fr">parrainage</span><span class="en">referrals</span></div>
+      </div>
+
+      <div class="brick">
+        <span class="ico">FID</span>
+        <h3><span class="fr">Fidéliser les participants</span><span class="en">Keeping attendees loyal</span></h3>
+        <p><span class="fr">Repérer automatiquement les meilleurs clients et ceux qui s'éloignent, mesurer leur satisfaction, et garder le contact avec les anciens participants pour les faire revenir.</span><span class="en">Automatically spot the best customers and those drifting away, measure their satisfaction, and stay in touch with past attendees to bring them back.</span></p>
+        <div class="tags"><span class="fr">meilleurs clients</span><span class="en">best customers</span><span class="fr">satisfaction</span><span class="en">satisfaction</span><span class="fr">réactivation</span><span class="en">re-engagement</span></div>
+      </div>
+
+      <div class="brick">
+        <span class="ico">RACHAT</span>
+        <h3><span class="fr">Rachat de billets</span><span class="en">Ticket buyback</span></h3>
+        <p><span class="fr">Un système officiel pour qu'un participant empêché puisse revendre son billet en toute sécurité, plutôt que de passer par la revente sauvage entre particuliers.</span><span class="en">An official system so an attendee who can't come can safely resell their ticket, instead of unregulated person-to-person reselling.</span></p>
+        <div class="tags"><span class="fr">revente sécurisée</span><span class="en">safe resale</span><span class="fr">anti-fraude</span><span class="en">anti-fraud</span></div>
+      </div>
+
+      <div class="brick">
+        <span class="ico">AUTO</span>
+        <h3><span class="fr">Actions automatiques</span><span class="en">Automatic actions</span></h3>
+        <p><span class="fr">Le logiciel agit tout seul selon des règles « si… alors… ». Exemple&nbsp;: quelqu'un commence à acheter un billet puis abandonne → un email de relance part automatiquement quelques minutes plus tard.</span><span class="en">The software acts on its own using "if… then…" rules. Example: someone starts buying a ticket then gives up → a reminder email is sent automatically a few minutes later.</span></p>
+        <div class="tags"><span class="fr">règles si/alors</span><span class="en">if/then rules</span><span class="fr">relances auto</span><span class="en">auto reminders</span></div>
+      </div>
+
+      <div class="brick">
+        <span class="ico">INTÉG</span>
+        <h3><span class="fr">Billetterie intégrable</span><span class="en">Embeddable ticketing</span></h3>
+        <p><span class="fr">La billetterie peut s'afficher directement dans le site web de l'organisateur, à ses propres couleurs, comme si elle lui appartenait.</span><span class="en">The ticketing can appear directly inside the organizer's own website, in their colors, as if it were theirs.</span></p>
+        <div class="tags"><span class="fr">sur leur site</span><span class="en">on their site</span><span class="fr">à leurs couleurs</span><span class="en">their branding</span></div>
+      </div>
+
+      <div class="brick">
+        <span class="ico">CHAT</span>
+        <h3><span class="fr">Assistant de discussion (chatbot)</span><span class="en">Chat assistant (chatbot)</span></h3>
+        <p><span class="fr">Un assistant qui répond aux questions des visiteurs directement sur le site et oriente les demandes vers la bonne personne.</span><span class="en">An assistant that answers visitors' questions right on the site and routes requests to the right person.</span></p>
+        <div class="tags"><span class="fr">réponses auto</span><span class="en">auto answers</span><span>support</span></div>
+      </div>
+
+      <div class="brick">
+        <span class="ico">AGENTS</span>
+        <h3><span class="fr">Assistants IA qui travaillent seuls</span><span class="en">AI assistants that work on their own</span></h3>
+        <p><span class="fr">De petits assistants IA qui enchaînent des tâches sans moi&nbsp;: trouver des contacts, rédiger des messages, vérifier leur qualité, analyser les résultats, sur demande ou à heure fixe.</span><span class="en">Small AI assistants that chain tasks without me: find contacts, write messages, check their quality, analyze results, on demand or on a fixed schedule.</span></p>
+        <div class="tags"><span class="fr">tâches en chaîne</span><span class="en">chained tasks</span><span class="fr">programmés</span><span class="en">scheduled</span></div>
+      </div>
+
+      <div class="brick">
+        <span class="ico">GUIDES</span>
+        <h3><span class="fr">Centre d'aide en ligne</span><span class="en">Online help center</span></h3>
+        <p><span class="fr">Des pages de guides publiques, avec petites démonstrations animées, moteur de recherche et liens entre les articles, pensées aussi pour être bien référencées sur Google.</span><span class="en">Public guide pages, with small animated demos, a search engine and links between articles, also designed to rank well on Google.</span></p>
+        <div class="tags"><span class="fr">guides</span><span class="en">guides</span><span class="fr">recherche</span><span class="en">search</span><span class="fr">référencement</span><span class="en">SEO</span></div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- INTERFACE PREVIEW -->
+<section id="preview">
+  <div class="wrap">
+    <div class="sec-label">03 · <span class="fr">Aperçu de l'interface</span><span class="en">Interface preview</span></div>
+    <h2><span class="fr">À quoi ça ressemble vraiment</span><span class="en">What it actually looks like</span></h2>
+    <p class="sec-intro">
+      <span class="fr">Voici huit écrans réels de l'application, côté organisateur (tableau de bord, statistiques, support, gestion des accès) et côté participant (réservation, paiement, billets, revente), reproduits ici à l'identique et anonymisés. Nom du produit, noms, emails, lieu et adresse ont été remplacés par des exemples&nbsp;: marque, données et identités sont fictives.</span>
+      <span class="en">Here are eight real screens from the application, organizer side (dashboard, analytics, support, access management) and attendee side (booking, payment, tickets, resale), reproduced faithfully and anonymized. Product name, names, emails, venue and address have been replaced with examples: brand, data and identities are fictional.</span>
+    </p>
+
+    <div class="shots">
+
+      <!-- Organizer dashboard -->
+      <div>
+        <span class="tag-real"><span class="fr">Écran 1 · Tableau de bord organisateur</span><span class="en">Screen 1 · Organizer dashboard</span></span>
+        <div class="frame">
+          <div class="bar"><i></i><i></i><i></i><span class="addr">openticket.app/organizer</span></div>
+          <div class="app">
+            <aside class="side">
+              <div class="logo plain">OpenTicket</div>
+              <div class="org">🏢 ACME EVENTS</div>
+              <div class="navwrap">
+                <div class="nav active"><span class="gi"></span> <span class="fr">Tableau de bord</span><span class="en">Dashboard</span></div>
+                <div class="nav"><span class="gi"></span> CRM</div>
+                <div class="nav"><span class="gi"></span> <span class="fr">Créer un événement</span><span class="en">Create an event</span></div>
+                <div class="nav"><span class="gi"></span> <span class="fr">Mon solde</span><span class="en">My balance</span></div>
+                <div class="nav"><span class="gi"></span> <span class="fr">Équipe</span><span class="en">Team</span></div>
+                <div class="nav"><span class="gi"></span> <span class="fr">Mon compte</span><span class="en">My account</span></div>
+                <div class="nav"><span class="gi"></span> <span class="fr">Paramètres</span><span class="en">Settings</span></div>
+                <div class="nav"><span class="gi"></span> <span class="fr">Ressources</span><span class="en">Resources</span></div>
+              </div>
+              <div class="uf"><div class="nm">Alex Martin</div><div class="em">admin@openticket.app</div><div class="lo">↩ <span class="fr">Déconnexion</span><span class="en">Log out</span></div></div>
+            </aside>
+            <div class="main">
+              <div class="chips">
+                <span class="on"><span class="fr">Tout</span><span class="en">All</span></span>
+                <span>7j</span><span>30j</span><span>90j</span>
+                <span><span class="fr">Personnalisé</span><span class="en">Custom</span></span>
+              </div>
+              <div class="kpis" style="grid-template-columns:repeat(3,1fr);margin-bottom:20px;">
+                <div class="kpi"><div class="k"><span class="fr">Revenu net</span><span class="en">Net revenue</span></div><div class="v">405 €</div><div class="d"><span class="fr">Cumul après commissions</span><span class="en">Total after fees</span></div></div>
+                <div class="kpi"><div class="k"><span class="fr">Billets vendus</span><span class="en">Tickets sold</span></div><div class="v">36</div><div class="d"><span class="fr">Tous événements confondus</span><span class="en">All events combined</span></div></div>
+                <div class="kpi"><div class="k"><span class="fr">Événements publiés</span><span class="en">Published events</span></div><div class="v">5</div><div class="d"><span class="fr">En vente actuellement</span><span class="en">Currently on sale</span></div></div>
+              </div>
+              <p class="h" style="font-size:16px;"><span class="fr">Mes événements</span><span class="en">My events</span></p>
+              <p class="sub"><span class="fr">Triés par date, du plus récent au plus ancien.</span><span class="en">Sorted by date, newest first.</span></p>
+              <div class="filters">
+                <span class="se">🔎 <span class="fr">Rechercher un événement…</span><span class="en">Search an event…</span></span>
+                <span class="fd"><span class="fr">Tous</span><span class="en">All</span> ⌄</span>
+                <span class="fd"><span class="fr">Tous les lieux</span><span class="en">All venues</span> ⌄</span>
+              </div>
+              <div class="erow">
+                <div class="ethumb">E</div>
+                <div style="flex:1;">
+                  <div class="enm"><span class="fr">SOIRÉE D'OUVERTURE</span><span class="en">OPENING NIGHT</span></div>
+                  <div class="edt">📅 28/06/2026</div>
+                </div>
+                <span class="bdg ok"><span class="fr">Publié</span><span class="en">Live</span></span>
+                <div class="eprog"><div class="lbl"><span>5 / 20</span><span>25 %</span></div><div class="track"><div class="fill" style="width:25%;"></div></div></div>
+                <b>21 €</b>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="shot-cap"><b><span class="fr">Tableau de bord organisateur.</span><span class="en">Organizer dashboard.</span></b> <span class="fr">Revenu net (après commissions), billets vendus et événements en vente, avec la liste des événements, leur taux de remplissage et la recherche par filtres.</span><span class="en">Net revenue (after fees), tickets sold and events on sale, with the event list, fill rate and search filters.</span></p>
+      </div>
+
+      <!-- CRM overview -->
+      <div>
+        <span class="tag-real"><span class="fr">Écran 2 · CRM, vue d'ensemble</span><span class="en">Screen 2 · CRM overview</span></span>
+        <div class="frame">
+          <div class="bar"><i></i><i></i><i></i><span class="addr">openticket.app/crm</span></div>
+          <div class="app">
+            <aside class="side">
+              <div class="logo">OpenTicket <span class="badge crm">CRM</span></div>
+              <div class="org">🏢 ACME EVENTS</div>
+              <div class="navwrap">
+                <div class="grp">Vue</div>
+                <div class="nav active"><span class="gi"></span> <span class="fr">Vue d'ensemble</span><span class="en">Overview</span></div>
+                <div class="grp"><span class="fr">Clients &amp; événements</span><span class="en">Clients &amp; events</span></div>
+                <div class="nav"><span class="gi"></span> <span class="fr">Acheteurs</span><span class="en">Buyers</span></div>
+                <div class="nav"><span class="gi"></span> <span class="fr">Organisations B2B</span><span class="en">B2B organizations</span></div>
+                <div class="nav"><span class="gi"></span> <span class="fr">Événements</span><span class="en">Events</span></div>
+              </div>
+              <div class="uf"><div class="lo" style="margin-bottom:9px;">← <span class="fr">Retour au dashboard</span><span class="en">Back to dashboard</span></div><div class="nm">Alex Martin</div><div class="em">admin@openticket.app</div></div>
+            </aside>
+            <div class="main">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;">
+                <div>
+                  <p class="h"><span class="fr">Vue d'ensemble</span><span class="en">Overview</span></p>
+                  <p class="sub">ACME EVENTS · <span class="fr">KPI et indicateurs cross-events.</span><span class="en">cross-event KPIs and indicators.</span></p>
+                </div>
+                <div class="exp"><span>⬇ <span class="fr">Exporter (XLSX)</span><span class="en">Export (XLSX)</span></span></div>
+              </div>
+              <div class="chips">
+                <span class="on"><span class="fr">Tout</span><span class="en">All</span></span>
+                <span><span class="fr">7 derniers jours</span><span class="en">Last 7 days</span></span>
+                <span><span class="fr">30 derniers jours</span><span class="en">Last 30 days</span></span>
+                <span><span class="fr">90 derniers jours</span><span class="en">Last 90 days</span></span>
+                <span><span class="fr">Personnalisé</span><span class="en">Custom</span></span>
+              </div>
+              <div class="kpis">
+                <div class="kpi"><div class="k"><span class="fr">Events créés</span><span class="en">Events created</span></div><div class="v">5</div><div class="d"><span class="fr">sur la période</span><span class="en">in period</span></div></div>
+                <div class="kpi"><div class="k"><span class="fr">Events réalisés</span><span class="en">Events held</span></div><div class="v">4</div><div class="d"><span class="fr">passés</span><span class="en">past</span></div></div>
+                <div class="kpi"><div class="k"><span class="fr">Billets vendus</span><span class="en">Tickets sold</span></div><div class="v">33</div><div class="d"><span class="fr">hors annulés</span><span class="en">excl. cancelled</span></div></div>
+                <div class="kpi"><div class="k"><span class="fr">Acheteurs</span><span class="en">Buyers</span></div><div class="v">4</div><div class="d"><span class="fr">distincts</span><span class="en">distinct</span></div></div>
+                <div class="kpi"><div class="k"><span class="fr">Transaction TTC</span><span class="en">Gross transactions</span></div><div class="v">479,00 €</div><div class="d"><span class="fr">Brut encaissé</span><span class="en">Gross collected</span></div></div>
+                <div class="kpi"><div class="k"><span class="fr">Revenu net</span><span class="en">Net revenue</span></div><div class="v">405,22 €</div><div class="d"><span class="fr">Après déduction des frais</span><span class="en">After fees</span></div></div>
+                <div class="kpi"><div class="k"><span class="fr">Commissions OpenTicket</span><span class="en">OpenTicket fees</span></div><div class="v">23,28 €</div><div class="d"><span class="fr">Plateforme</span><span class="en">Platform</span></div></div>
+                <div class="kpi"><div class="k">Fees Stripe</div><div class="v">15,69 €</div><div class="d">1,5 % + 0,25 €/<span class="fr">billet</span><span class="en">ticket</span></div></div>
+                <div class="kpi"><div class="k"><span class="fr">Taux remplissage</span><span class="en">Fill rate</span></div><div class="v">62 %</div><div class="d"><span class="fr">events réalisés</span><span class="en">held events</span></div></div>
+                <div class="kpi"><div class="k"><span class="fr">NPS moyen</span><span class="en">Avg. NPS</span></div><div class="v">41</div><div class="d"><span class="fr">satisfaction</span><span class="en">satisfaction</span></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="shot-cap"><b><span class="fr">CRM, indicateurs cross-events.</span><span class="en">CRM, cross-event indicators.</span></b> <span class="fr">Vue consolidée tous événements&nbsp;: transactions, revenu net, commissions plateforme, frais Stripe, taux de remplissage et satisfaction (NPS), exportable.</span><span class="en">Consolidated all-events view: transactions, net revenue, platform fees, Stripe fees, fill rate and satisfaction (NPS), exportable.</span></p>
+      </div>
+
+      <!-- Buyer ticket page -->
+      <div>
+        <span class="tag-real"><span class="fr">Écran 3 · Page de réservation (côté participant)</span><span class="en">Screen 3 · Booking page (attendee side)</span></span>
+        <div class="frame">
+          <div class="bar"><i></i><i></i><i></i><span class="addr">openticket.app/e/soiree-ouverture</span></div>
+          <div class="pub">
+            <div class="pubtop">
+              <span class="pblogo">OpenTicket</span>
+              <span class="pbnav"><span class="fr">Mes billets</span><span class="en">My tickets</span><span class="btn"><span class="fr">Organisateurs</span><span class="en">Organizers</span></span><span class="btn"><span class="fr">Événements</span><span class="en">Events</span></span><span>Alex Martin</span></span>
+            </div>
+            <div class="pubgrid">
+              <div class="evt">
+                <h3 class="evtitle"><span class="fr">SOIRÉE D'OUVERTURE</span><span class="en">OPENING NIGHT</span></h3>
+                <div class="evmeta"><span>📅</span> <span class="fr">Dimanche 28 juin 2026 · 19:30</span><span class="en">Sunday, June 28, 2026 · 7:30 PM</span></div>
+                <div class="evmeta"><span class="pin">📍</span> <span><b>Le Grand Studio</b><br>12 rue des Arts, 75011 Paris, France</span></div>
+                <div class="evlink"><span class="fr">Voir sur Google Maps ↗</span><span class="en">View on Google Maps ↗</span></div>
+                <p class="evdesc"><span class="fr">Une soirée live dans un lieu intimiste. Ouverture des portes à 19h30.</span><span class="en">A live evening in an intimate venue. Doors open at 7:30 PM.</span></p>
+                <div class="trow">
+                  <div><div class="tname">VIP <small><span class="fr">8 places restantes</span><span class="en">8 left</span></small></div><div class="tprice">10,00 €</div></div>
+                  <div class="step"><b>−</b><span class="q">1</span><b>+</b></div>
+                </div>
+                <div class="trow">
+                  <div><div class="tname"><span class="fr">CATÉGORIE 1</span><span class="en">CATEGORY 1</span> <small><span class="fr">7 places restantes</span><span class="en">7 left</span></small></div><div class="tprice">5,00 €</div></div>
+                  <div class="step"><b>−</b><span class="q">0</span><b>+</b></div>
+                </div>
+                <div class="promo"><span><span class="fr">🏷 J'ai un code promo</span><span class="en">🏷 I have a promo code</span></span><span>⌄</span></div>
+              </div>
+              <div class="cart">
+                <div class="ct"><span class="ti">🎟</span> <span class="fr">Votre sélection</span><span class="en">Your selection</span></div>
+                <div class="cline"><span class="fr">Billets sélectionnés</span><span class="en">Tickets selected</span><b>1</b></div>
+                <div class="cline tot"><span>Total</span><b>10,00 €</b></div>
+                <div class="cnote"><span class="fr">Commission de service incluse.</span><span class="en">Service fee included.</span></div>
+                <div class="paybtn"><span class="fr">Payer 10,00 €</span><span class="en">Pay 10,00 €</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="shot-cap"><b><span class="fr">Réservation publique.</span><span class="en">Public booking.</span></b> <span class="fr">Plusieurs catégories de places, quantités limitées en temps réel, champ code promo et récapitulatif avec total, la commission de la plateforme reste invisible.</span><span class="en">Multiple ticket categories, real-time limited quantities, promo-code field and a running total, the platform fee stays invisible.</span></p>
+      </div>
+
+      <!-- Checkout -->
+      <div>
+        <span class="tag-real"><span class="fr">Écran 4 · Paiement sécurisé</span><span class="en">Screen 4 · Secure checkout</span></span>
+        <div class="frame">
+          <div class="bar"><i></i><i></i><i></i><span class="addr">checkout · paiement sécurisé</span></div>
+          <div class="paywrap">
+            <div class="paycard">
+              <div class="payhead"><span><span class="fr">Paiement sécurisé</span><span class="en">Secure checkout</span></span><span class="x">✕</span></div>
+              <div class="paybody">
+                <div class="testmode"><span>TEST MODE</span></div>
+                <div class="payitem"><span class="fr">SOIRÉE D'OUVERTURE · VIP</span><span class="en">OPENING NIGHT · VIP</span></div>
+                <div class="payamt">10,00 €</div>
+                <div class="wallets">
+                  <div class="wallet link">link</div>
+                  <div class="wallet amz">amazon pay</div>
+                </div>
+                <div class="or">OU</div>
+                <div class="pfield"><span class="lab">E-mail</span><span>alex.martin@email.com</span></div>
+                <div class="pmlabel"><span class="fr">Moyen de paiement</span><span class="en">Payment method</span></div>
+                <div class="pm"><span class="radio"></span> <span class="fr">Carte</span><span class="en">Card</span> <span class="cards"><b>VISA</b><b class="mc">MC</b><b class="cb">CB</b><b class="ax">AMEX</b></span></div>
+                <div class="pm"><span class="radio"></span> Klarna <span class="kl">Klarna</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="shot-cap"><b><span class="fr">Paiement intégré (Stripe).</span><span class="en">Embedded payment (Stripe).</span></b> <span class="fr">Carte bancaire, portefeuilles (Link, Amazon Pay) et paiement fractionné (Klarna), dans une fenêtre sécurisée. Ici en mode test.</span><span class="en">Card, wallets (Link, Amazon Pay) and pay-in-installments (Klarna), in a secure window. Shown here in test mode.</span></p>
+      </div>
+
+      <!-- My tickets -->
+      <div>
+        <span class="tag-real"><span class="fr">Écran 5 · Mes billets (espace participant)</span><span class="en">Screen 5 · My tickets (attendee area)</span></span>
+        <div class="frame">
+          <div class="bar"><i></i><i></i><i></i><span class="addr">openticket.app/account/tickets</span></div>
+          <div class="app">
+            <aside class="side">
+              <div class="logo plain">OpenTicket</div>
+              <div class="navwrap">
+                <div class="nav active"><span class="gi"></span> <span class="fr">Mes billets</span><span class="en">My tickets</span></div>
+                <div class="nav"><span class="gi"></span> <span class="fr">Revente de places</span><span class="en">Resell tickets</span></div>
+                <div class="nav"><span class="gi"></span> <span class="fr">Mon solde</span><span class="en">My balance</span></div>
+                <div class="nav"><span class="gi"></span> <span class="fr">Paramètres</span><span class="en">Settings</span></div>
+              </div>
+              <div class="uf"><div class="nm">Alex Martin</div><div class="em">admin@openticket.app</div><div class="lo">↩ <span class="fr">Déconnexion</span><span class="en">Log out</span></div></div>
+            </aside>
+            <div class="main">
+              <p class="h"><span class="fr">Mes billets</span><span class="en">My tickets</span></p>
+              <p class="sub"><span class="fr">Retrouvez ici vos billets, vos loteries en cours et vos ordres de rachat.</span><span class="en">Find your tickets, ongoing lotteries and buyback orders here.</span></p>
+              <div class="tabs">
+                <div class="tabb on"><span class="fr">Actifs</span><span class="en">Active</span> <span class="ct">3</span></div>
+                <div class="tabb"><span class="fr">Passés</span><span class="en">Past</span> <span class="ct">5</span></div>
+                <div class="tabb"><span class="fr">Transférés</span><span class="en">Transferred</span> <span class="ct">0</span></div>
+              </div>
+              <div class="ecards">
+                <div class="ecard"><div class="et"><span class="en">OPENING NIGHT</span><span class="fr">SOIRÉE D'OUVERTURE</span><span class="bdg ok"><span class="fr">Actif</span><span class="en">Active</span></span></div><div class="m">📅 28/06/2026 · 02:00<br>📍 Le Grand Studio</div><div class="foot"><span>VIP</span><span class="vl"><span class="fr">Voir le billet →</span><span class="en">View ticket →</span></span></div></div>
+                <div class="ecard"><div class="et"><span class="en">OPENING NIGHT</span><span class="fr">SOIRÉE D'OUVERTURE</span><span class="bdg ok"><span class="fr">Actif</span><span class="en">Active</span></span></div><div class="m">📅 28/06/2026 · 02:00<br>📍 Le Grand Studio</div><div class="foot"><span><span class="fr">CATÉGORIE 1</span><span class="en">CATEGORY 1</span></span><span class="vl"><span class="fr">Voir le billet →</span><span class="en">View ticket →</span></span></div></div>
+                <div class="ecard"><div class="et"><span class="en">OPENING NIGHT</span><span class="fr">SOIRÉE D'OUVERTURE</span><span class="bdg ok"><span class="fr">Actif</span><span class="en">Active</span></span></div><div class="m">📅 28/06/2026 · 02:00<br>📍 Le Grand Studio</div><div class="foot"><span><span class="fr">CATÉGORIE 1</span><span class="en">CATEGORY 1</span></span><span class="vl"><span class="fr">Voir le billet →</span><span class="en">View ticket →</span></span></div></div>
+              </div>
+              <p class="mh">🛒 <span class="fr">Mes ordres de rachat</span><span class="en">My buyback orders</span></p>
+              <p class="mhs"><span class="fr">Ces ordres se déclenchent automatiquement quand un billet correspondant se libère. Vous n'êtes prélevé qu'au moment du match.</span><span class="en">These orders trigger automatically when a matching ticket frees up. You're only charged when a match occurs.</span></p>
+              <div class="tabs">
+                <div class="tabb on"><span class="fr">Actifs</span><span class="en">Active</span> <span class="ct">0</span></div>
+                <div class="tabb"><span class="fr">Expirés</span><span class="en">Expired</span> <span class="ct">3</span></div>
+                <div class="tabb"><span class="fr">Exécutés</span><span class="en">Executed</span> <span class="ct">0</span></div>
+                <div class="tabb"><span class="fr">Annulés</span><span class="en">Cancelled</span> <span class="ct">3</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="shot-cap"><b><span class="fr">Espace participant.</span><span class="en">Attendee area.</span></b> <span class="fr">Billets actifs/passés/transférés, et « ordres de rachat » qui s'exécutent tout seuls dès qu'un billet recherché se libère.</span><span class="en">Active/past/transferred tickets, plus "buyback orders" that auto-execute as soon as a wanted ticket frees up.</span></p>
+      </div>
+
+      <!-- Resale -->
+      <div>
+        <span class="tag-real"><span class="fr">Écran 6 · Revente de places</span><span class="en">Screen 6 · Ticket resale</span></span>
+        <div class="frame">
+          <div class="bar"><i></i><i></i><i></i><span class="addr">openticket.app/account/resale</span></div>
+          <div class="app">
+            <aside class="side">
+              <div class="logo plain">OpenTicket</div>
+              <div class="navwrap">
+                <div class="nav"><span class="gi"></span> <span class="fr">Mes billets</span><span class="en">My tickets</span></div>
+                <div class="nav active"><span class="gi"></span> <span class="fr">Revente de places</span><span class="en">Resell tickets</span></div>
+                <div class="nav"><span class="gi"></span> <span class="fr">Mon solde</span><span class="en">My balance</span></div>
+                <div class="nav"><span class="gi"></span> <span class="fr">Paramètres</span><span class="en">Settings</span></div>
+              </div>
+              <div class="uf"><div class="nm">Alex Martin</div><div class="em">admin@openticket.app</div><div class="lo">↩ <span class="fr">Déconnexion</span><span class="en">Log out</span></div></div>
+            </aside>
+            <div class="main">
+              <p class="mh" style="margin-top:0;"><span class="fr">Reventes en cours</span><span class="en">Listings in progress</span> <span style="color:var(--ink-faint);font-weight:400;">(0)</span></p>
+              <div class="empty" style="margin:10px 0 6px;">
+                <div class="t"><span class="fr">Aucune revente en cours</span><span class="en">No listing in progress</span></div>
+                <div class="s"><span class="fr">Vous pouvez mettre un billet en revente dès que l'événement est complet.</span><span class="en">You can list a ticket for resale once the event is sold out.</span></div>
+                <span class="b"><span class="fr">Voir mes billets</span><span class="en">View my tickets</span></span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:flex-end;margin:22px 0 12px;">
+                <span class="mh" style="margin:0;"><span class="fr">Historique</span><span class="en">History</span> <span style="color:var(--ink-faint);font-weight:400;">(2)</span></span>
+                <span class="exp"><span>⬇ CSV</span><span>⬇ XLSX</span></span>
+              </div>
+              <table class="tbl">
+                <thead><tr><th><span class="fr">Événement</span><span class="en">Event</span></th><th><span class="fr">Catégorie</span><span class="en">Category</span></th><th class="r"><span class="fr">Prix demandé</span><span class="en">Asking</span></th><th class="r"><span class="fr">Prix vendu</span><span class="en">Sold</span></th><th><span class="fr">Statut</span><span class="en">Status</span></th><th><span class="fr">Date finale</span><span class="en">Final date</span></th></tr></thead>
+                <tbody>
+                  <tr><td><span class="fr">CONCERT JAZZ</span><span class="en">JAZZ CONCERT</span><br><small style="color:var(--ink-faint)">📅 27/05/2026</small></td><td>CAT1</td><td class="r">30 €</td><td class="r">—</td><td><span class="bdg gray"><span class="fr">Annulé</span><span class="en">Cancelled</span></span></td><td>13/05/2026</td></tr>
+                  <tr><td><span class="fr">SOIRÉE LIVE</span><span class="en">LIVE NIGHT</span><br><small style="color:var(--ink-faint)">📅 30/05/2026</small></td><td>CAT1</td><td class="r">34 €</td><td class="r">34 €</td><td><span class="bdg ok"><span class="fr">Vendu</span><span class="en">Sold</span></span></td><td>02/05/2026</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <p class="shot-cap"><b><span class="fr">Revente encadrée.</span><span class="en">Governed resale.</span></b> <span class="fr">Historique des reventes avec prix demandé, prix vendu et statut, exportable. La revente n'ouvre que sur événement complet.</span><span class="en">Resale history with asking price, sold price and status, exportable. Resale only opens for sold-out events.</span></p>
+      </div>
+
+      <!-- Support (admin) -->
+      <div>
+        <span class="tag-real"><span class="fr">Écran 7 · Support (back-office)</span><span class="en">Screen 7 · Support (back-office)</span></span>
+        <div class="frame">
+          <div class="bar"><i></i><i></i><i></i><span class="addr">openticket.app/admin/support</span></div>
+          <div class="app">
+            <aside class="side">
+              <div class="logo">OpenTicket <span class="badge">ADMIN</span></div>
+              <div class="grp">Plateforme</div>
+              <div class="nav"><span class="gi"></span> Dashboard</div>
+              <div class="nav"><span class="gi"></span> Analytics</div>
+              <div class="nav"><span class="gi"></span> Clients</div>
+              <div class="nav"><span class="gi"></span> <span class="fr">Événements</span><span class="en">Events</span></div>
+              <div class="nav active"><span class="gi"></span> Support</div>
+              <div class="grp">Commercial</div>
+              <div class="nav"><span class="gi"></span> Pipeline</div>
+            </aside>
+            <div class="main">
+              <div class="kpis" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px;">
+                <div class="kpi"><div class="k"><span class="fr">Tickets ouverts</span><span class="en">Open tickets</span></div><div class="v">4</div></div>
+                <div class="kpi"><div class="k"><span class="fr">À traiter (urgent)</span><span class="en">To handle (urgent)</span></div><div class="v">0</div></div>
+                <div class="kpi"><div class="k"><span class="fr">Résolus aujourd'hui</span><span class="en">Resolved today</span></div><div class="v">0</div></div>
+              </div>
+              <div class="filters">
+                <span class="se">🔎 <span class="fr">Rechercher sujet, email…</span><span class="en">Search subject, email…</span></span>
+                <span class="fd"><span class="fr">Statut</span><span class="en">Status</span> ⌄</span>
+                <span class="fd"><span class="fr">Catégorie</span><span class="en">Category</span> ⌄</span>
+                <span class="fd"><span class="fr">Priorité</span><span class="en">Priority</span> ⌄</span>
+              </div>
+              <div class="exp" style="margin-bottom:12px;"><span>⬇ CSV</span><span>⬇ Excel</span></div>
+              <table class="tbl">
+                <thead><tr><th><span class="fr">Date</span><span class="en">Date</span></th><th><span class="fr">Sujet</span><span class="en">Subject</span></th><th><span class="fr">Émetteur</span><span class="en">Sender</span></th><th><span class="fr">Catégorie</span><span class="en">Category</span></th><th><span class="fr">Priorité</span><span class="en">Priority</span></th><th><span class="fr">Statut</span><span class="en">Status</span></th><th><span class="fr">Assigné</span><span class="en">Assignee</span></th></tr></thead>
+                <tbody>
+                  <tr>
+                    <td>15/05/2026</td>
+                    <td><span class="fr">Demande de remboursement</span><span class="en">Refund request</span></td>
+                    <td>marie.l@email.com<br><span class="bdg blue" style="margin-top:5px;display:inline-block;"><span class="fr">Acheteur</span><span class="en">Buyer</span></span></td>
+                    <td><span class="fr">Remboursement</span><span class="en">Refund</span></td>
+                    <td><span class="bdg no"><span class="fr">Urgente</span><span class="en">Urgent</span></span></td>
+                    <td><span class="bdg ok"><span class="fr">Résolu</span><span class="en">Resolved</span></span></td>
+                    <td>Jordan P.</td>
+                  </tr>
+                  <tr>
+                    <td>24/06/2026</td>
+                    <td><span class="fr">Problème de paiement</span><span class="en">Payment issue</span></td>
+                    <td>contact@acme-events.com<br><span class="bdg ok" style="margin-top:5px;display:inline-block;"><span class="fr">Organisateur</span><span class="en">Organizer</span></span> · ACME EVENTS</td>
+                    <td><span class="fr">Autre</span><span class="en">Other</span></td>
+                    <td><span class="bdg gray"><span class="fr">Normale</span><span class="en">Normal</span></span></td>
+                    <td><span class="bdg blue"><span class="fr">Ouvert</span><span class="en">Open</span></span></td>
+                    <td>—</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <p class="shot-cap"><b><span class="fr">Support intégré.</span><span class="en">Built-in support.</span></b> <span class="fr">File de tickets avec priorités, catégories, recherche, filtres et attribution, distinguant acheteurs et organisateurs.</span><span class="en">Ticket queue with priorities, categories, search, filters and assignment, separating buyers from organizers.</span></p>
+      </div>
+
+      <!-- Admin team (settings) -->
+      <div>
+        <span class="tag-real"><span class="fr">Écran 8 · Gestion des accès (paramètres)</span><span class="en">Screen 8 · Access management (settings)</span></span>
+        <div class="frame">
+          <div class="bar"><i></i><i></i><i></i><span class="addr">openticket.app/admin/settings/team</span></div>
+          <div class="app">
+            <aside class="side">
+              <div class="logo">OpenTicket <span class="badge">ADMIN</span></div>
+              <div class="grp">Plateforme</div>
+              <div class="nav"><span class="gi"></span> Dashboard</div>
+              <div class="nav"><span class="gi"></span> Analytics</div>
+              <div class="nav"><span class="gi"></span> Clients</div>
+              <div class="nav"><span class="gi"></span> <span class="fr">Événements</span><span class="en">Events</span></div>
+              <div class="nav"><span class="gi"></span> Support</div>
+              <div class="grp">Commercial</div>
+              <div class="nav"><span class="gi"></span> Pipeline</div>
+            </aside>
+            <div class="main">
+              <p class="sub" style="margin-bottom:4px;">← <span class="fr">Paramètres</span><span class="en">Settings</span></p>
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;">
+                <div>
+                  <p class="h"><span class="fr">Équipe administrateur</span><span class="en">Admin team</span></p>
+                  <p class="sub"><span class="fr">Gestion des accès au back-office OpenTicket.</span><span class="en">Manage access to the OpenTicket back-office.</span></p>
+                </div>
+                <span class="inv">+ <span class="fr">Inviter un admin</span><span class="en">Invite an admin</span></span>
+              </div>
+              <p class="mhs" style="text-transform:uppercase;letter-spacing:.4px;margin:18px 0 8px;"><span class="fr">Administrateurs (2)</span><span class="en">Administrators (2)</span></p>
+              <table class="tbl">
+                <thead><tr><th>Email</th><th><span class="fr">Nom</span><span class="en">Name</span></th><th><span class="fr">Rôle</span><span class="en">Role</span></th><th><span class="fr">Dernière connexion</span><span class="en">Last login</span></th><th><span class="fr">Inscrit le</span><span class="en">Joined</span></th></tr></thead>
+                <tbody>
+                  <tr><td>jordan.payet@openticket.app</td><td>Jordan Payet</td><td><span class="bdg purple">Super admin</span></td><td>22/05/2026 10:35</td><td>28/04/2026</td></tr>
+                  <tr><td>alex.martin@openticket.app <span class="youtag"><span class="fr">VOUS</span><span class="en">YOU</span></span></td><td>Alex Martin</td><td><span class="bdg purple">Super admin</span></td><td>17/06/2026 18:01</td><td>16/04/2026</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <p class="shot-cap"><b><span class="fr">Gestion des accès.</span><span class="en">Access management.</span></b> <span class="fr">Invitation d'administrateurs, rôles (super admin), suivi des dernières connexions, la couche sécurité/permissions du back-office.</span><span class="en">Admin invitations, roles (super admin), last-login tracking, the back-office security/permissions layer.</span></p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- STACK -->
+<section id="stack">
+  <div class="wrap">
+    <div class="sec-label">04 · <span class="fr">Les technologies</span><span class="en">The technologies</span></div>
+    <h2><span class="fr">Les outils derrière le produit</span><span class="en">The tools behind the product</span></h2>
+    <p class="sec-intro">
+      <span class="fr">Pas besoin d'être technique pour lire cette section&nbsp;: ce sont simplement les briques professionnelles standards d'une application web moderne. Toutes ont été choisies et assemblées avec l'aide de l'IA. Les libellés entre parenthèses indiquent à quoi sert chaque outil.</span>
+      <span class="en">No technical background needed here: these are simply the standard professional building blocks of a modern web app. All were chosen and assembled with the help of AI. The labels in parentheses say what each tool is for.</span>
+    </p>
+    <div class="stack-grid">
+      <div class="stack-card">
+        <h3><span class="fr">L'application (ce que voit l'utilisateur)</span><span class="en">The app (what users see)</span></h3>
+        <div class="items"><span>Next.js</span><span>React</span><span>TypeScript</span><span>HTML / CSS</span></div>
+      </div>
+      <div class="stack-card">
+        <h3><span class="fr">Les données (où tout est stocké)</span><span class="en">The data (where everything is stored)</span></h3>
+        <div class="items"><span>Supabase</span><span>PostgreSQL</span><span class="fr">base de données sécurisée</span><span class="en">secure database</span></div>
+      </div>
+      <div class="stack-card">
+        <h3><span class="fr">Les services connectés</span><span class="en">Connected services</span></h3>
+        <div class="items"><span class="fr">Stripe (paiement)</span><span class="en">Stripe (payment)</span><span class="fr">Resend (emails)</span><span class="en">Resend (emails)</span><span class="fr">Blockchain (option)</span><span class="en">Blockchain (option)</span></div>
+      </div>
+      <div class="stack-card">
+        <h3><span class="fr">La fabrication &amp; la mise en ligne (IA)</span><span class="en">Build &amp; publishing (AI)</span></h3>
+        <div class="items"><span class="fr">Claude Code (écrit le code)</span><span class="en">Claude Code (writes the code)</span><span class="fr">Cowork (pilotage)</span><span class="en">Cowork (steering)</span><span>GitHub</span><span class="fr">mise en ligne auto</span><span class="en">auto publishing</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="wrap">
+    <div class="skills">
+      <div class="sec-label">05 · <span class="fr">Ce que ça démontre</span><span class="en">What this demonstrates</span></div>
+      <h2><span class="fr">Les compétences IA mises en œuvre</span><span class="en">The AI skills applied</span></h2>
+      <div class="skills-grid">
+        <div class="skill-item">
+          <h3><span class="fr">Traduire un besoin en logiciel</span><span class="en">Turning needs into software</span></h3>
+          <p><span class="fr">Décomposer une vision produit en spécifications, prompts et tâches que des agents d'IA peuvent exécuter de façon fiable.</span><span class="en">Breaking a product vision into specs, prompts and tasks that AI agents can execute reliably.</span></p>
+        </div>
+        <div class="skill-item">
+          <h3><span class="fr">Orchestration multi-outils</span><span class="en">Multi-tool orchestration</span></h3>
+          <p><span class="fr">Faire travailler ensemble assistant de code, connecteurs base de données, navigateur piloté et agents autonomes.</span><span class="en">Making a coding assistant, database connectors, a driven browser and autonomous agents work together.</span></p>
+        </div>
+        <div class="skill-item">
+          <h3><span class="fr">Rigueur &amp; organisation</span><span class="en">Rigor &amp; organization</span></h3>
+          <p><span class="fr">Chaque changement est testé et noté, les règles importantes sont écrites une fois pour toutes, pour éviter que tout devienne un château de cartes.</span><span class="en">Every change is tested and documented, key rules are written down once and for all, so the whole thing doesn't turn into a house of cards.</span></p>
+        </div>
+        <div class="skill-item">
+          <h3><span class="fr">Autonomie &amp; vitesse</span><span class="en">Autonomy &amp; speed</span></h3>
+          <p><span class="fr">Livrer en production, seul, des fonctionnalités qui demandent habituellement une équipe, en pilotant l'IA de bout en bout.</span><span class="en">Shipping to production, solo, features that usually take a team, by driving AI end to end.</span></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- NOTE -->
+<section id="note" style="border-bottom:none;">
+  <div class="wrap">
+    <div class="note">
+      <span class="fr"><b>Note de transparence.</b> Ce projet est volontairement présenté de façon anonyme. C'est avant tout un projet personnel, lancé pour apprendre et pour aider des amis organisateurs d'événements ; il n'est pas destiné à être vendu. L'objectif de cette page n'est donc pas de promouvoir un produit, mais de montrer concrètement ce que l'on peut construire aujourd'hui en pilotant des outils d'IA.</span>
+      <span class="en"><b>Transparency note.</b> This project is intentionally presented anonymously. It is first and foremost a personal project, started to learn and to help friends who organize events; it is not meant to be sold. The goal of this page is therefore not to promote a product, but to concretely show what you can build today by directing AI tools.</span>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span class="fr">Étude de cas - Pierre BASTIER - SaaS construit uniquement en pilotant des outils IA.</span>
+    <span class="en">Case study - Pierre BASTIER - a SaaS built purely by steering AI tools.</span>
+  </div>
+</footer>
+
+<script>
+  function setLang(lang){
+    document.documentElement.setAttribute('data-lang', lang);
+    document.documentElement.setAttribute('lang', lang);
+    document.getElementById('btn-fr').classList.toggle('active', lang==='fr');
+    document.getElementById('btn-en').classList.toggle('active', lang==='en');
+  }
+</script>
+</body>
+</html>
